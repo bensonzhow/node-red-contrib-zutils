@@ -1,0 +1,43 @@
+<!-- 向编辑器注册的主节点定义 -->
+<script type="text/javascript">
+    RED.nodes.registerType('Ztbsocket', {
+        category: "zutils",
+        color:"#3FADB5",
+        defaults: {
+            name: {value: ""}
+        },
+        inputs: 1,
+        outputs: 3,
+        icon: "bridge.svg",
+        label: function () {
+            return this.name || 'Ztbsocket';
+        }
+    });
+  </script>
+  <!-- 编辑对话框 -->
+  <script type="text/html" data-template-name="Ztbsocket">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> 名称</label>
+        <input type="text" id="node-input-name" placeholder="名称"/>
+    </div>
+  </script>
+  <!-- 帮助文本 -->
+  <script type="text/html" data-help-name="Ztbsocket">
+    <p>Ztbsocket</p>
+    <p>物联平台专用客户端</p>
+    <pre>
+      closeAfterSent: true, // close after sent
+      sendAfterConnect: true, // send after connect
+      token: null,
+      sendMsg: null,
+      zurl: null
+    </pre>
+    <pre>
+      output:[
+        错误消息，
+        侦听消息，
+        即可消息
+      ]
+    </pre>
+  </script>
+  
