@@ -1,0 +1,299 @@
+[
+    {
+        "id": "31e31c49363bf79e",
+        "type": "http request",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "请求经编车间",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 700,
+        "y": 220,
+        "wires": [
+            [
+                "9d53a6ed392a4722"
+            ]
+        ]
+    },
+    {
+        "id": "3ea58ec5dfd0caf3",
+        "type": "function",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "查经编车间参数",
+        "func": "msg._baseUrl = global.get('url');\nmsg._token = global.get('token') \nmsg.url = `${msg._baseUrl}api/entitiesQuery/find`;\nmsg.headers = {}\nmsg.headers['X-Authorization'] = `Bearer ${msg._token}`;\nmsg.payload={\n  \"entityFilter\": {\n    \"type\": \"entityType\",\n    \"resolveMultiple\": true,\n    \"entityType\": \"ASSET\"\n  },\n  \"pageLink\": {\n    \"pageSize\": 1024,\n    \"page\": 0,\n    \"sortOrder\": {\n      \"key\": {\n        \"type\": \"ENTITY_FIELD\",\n        \"key\": \"createdTime\"\n      },\n      \"direction\": \"DESC\"\n    }\n  },\n  \"keyFilters\": [\n    {\n      \"key\": {\n        \"type\": \"SERVER_ATTRIBUTE\",\n        \"key\": \"workshopType\"\n      },\n      \"valueType\": \"STRING\",\n      \"predicate\": {\n        \"operation\": \"EQUAL\",\n        \"value\": {\n          \"defaultValue\": \"warp\",\n          \"dynamicValue\": null\n        },\n        \"ignoreCase\": true,\n        \"type\": \"STRING\"\n      }\n    }\n  ],\n  \"entityFields\": [\n    {\n      \"type\": \"ENTITY_FIELD\",\n      \"key\": \"name\"\n    },\n    {\n      \"type\": \"ENTITY_FIELD\",\n      \"key\": \"label\"\n    },\n    {\n      \"type\": \"ENTITY_FIELD\",\n      \"key\": \"additionalInfo\"\n    }\n  ],\n  \"latestValues\": []\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 220,
+        "wires": [
+            [
+                "31e31c49363bf79e"
+            ]
+        ]
+    },
+    {
+        "id": "9d53a6ed392a4722",
+        "type": "function",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "解析车间数据",
+        "func": "\ntry {\n    msg.payload = JSON.parse(msg.payload).data;\n    return [null,msg]\n} catch (error) {\n    console.log(\"JSON parse Error!\")\n};\n\nreturn [msg,null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 220,
+        "wires": [
+            [
+                "2054ebb0e11ba156"
+            ],
+            [
+                "593c1c40f6c2312c"
+            ]
+        ]
+    },
+    {
+        "id": "593c1c40f6c2312c",
+        "type": "loop",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "遍历车间",
+        "kind": "enum",
+        "count": "",
+        "initial": "1",
+        "step": "1",
+        "condition": "",
+        "conditionType": "js",
+        "when": "before",
+        "enumeration": "payload",
+        "enumerationType": "msg",
+        "limit": "",
+        "loopPayload": "loop-val",
+        "finalPayload": "final-count",
+        "x": 140,
+        "y": 360,
+        "wires": [
+            [],
+            [
+                "46a63bc623806938",
+                "62a1240aab6dfb22"
+            ]
+        ]
+    },
+    {
+        "id": "2054ebb0e11ba156",
+        "type": "debug",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "解析错误",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "46a63bc623806938",
+        "type": "function",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "设置车间ID",
+        "func": "msg._workshopId = msg.payload.entityId.id; //（资产）车间ID\n// msg._workshopId = \"f916b750-0b9a-11f0-839f-89950131f7b2\"; //（资产）车间ID\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 360,
+        "wires": [
+            [
+                "868530aa4fa9a644"
+            ]
+        ]
+    },
+    {
+        "id": "103db5b31710ef92",
+        "type": "Ztbsocket",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "",
+        "x": 680,
+        "y": 360,
+        "wires": [
+            [],
+            [],
+            [
+                "b075d69011d91d2a"
+            ]
+        ]
+    },
+    {
+        "id": "868530aa4fa9a644",
+        "type": "function",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "车间设备平均车速",
+        "func": "const moment = global.get('moment'); // 假设 moment-timezone 已经挂载到 global\n\nconst zone = 'Asia/Shanghai';\n\n\n\nmsg._token = global.get('token') \n\n\nlet workshopId=msg._workshopId;\nlet startTs = moment.tz(msg.objLastShift.start_time, 'YYYY-MM-DD HH:mm:ss', zone).valueOf();\nlet endTs = moment.tz(msg.objLastShift.end_time, 'YYYY-MM-DD HH:mm:ss', zone).valueOf();\n\nlet sendData = {\n        \"cmds\": [\n            {\n                \"type\": \"ENTITY_DATA\",\n                \"query\": {\n                    \"entityFilter\": {\n                        \"type\": \"relationsQuery\",\n                        \"resolveMultiple\": true,\n                        \"rootStateEntity\": false,\n                        \"stateEntityParamName\": null,\n                        \"defaultStateEntity\": null,\n                        \"rootEntity\": {\n                            \"entityType\": \"ASSET\",\n                            \"id\": msg._workshopId\n                        },\n                        \"direction\": \"FROM\",\n                        \"maxLevel\": 6,\n                        \"fetchLastLevelOnly\": false,\n                        \"filters\": [\n                            {\n                                \"relationType\": \"Contains\",\n                                \"entityTypes\": [\n                                    \"DEVICE\"\n                                ]\n                            }\n                        ]\n                    },\n                    \"pageLink\": {\n                        \"page\": 0,\n                        \"pageSize\": 1000,\n                        \"textSearch\": null,\n                        \"dynamic\": true,\n                        \"sortOrder\": {\n                            \"key\": {\n                                \"key\": \"name\",\n                                \"type\": \"ENTITY_FIELD\"\n                            },\n                            \"direction\": \"ASC\"\n                        }\n                    },\n                    \"entityFields\": [\n                        {\n                            \"type\": \"ENTITY_FIELD\",\n                            \"key\": \"name\"\n                        },\n                        {\n                            \"type\": \"ENTITY_FIELD\",\n                            \"key\": \"label\"\n                        },\n                        {\n                            \"type\": \"ENTITY_FIELD\",\n                            \"key\": \"additionalInfo\"\n                        }\n                    ],\n                    \"latestValues\": []\n                },\n                \"aggHistoryCmd\": {\n                    \"keys\": [\n                        {\n                            \"id\": 1,\n                            \"key\": \"车速\",\n                            \"agg\": \"AVG\"\n                        }\n                    ],\n                    \"startTs\": startTs,\n                    \"endTs\": endTs\n                }\n                \n            }\n        ]\n    };\n\nmsg.zcfg={\n    zurl:\"ws://10.104.88.13:30080/api/ws\",\n    sendMsg: JSON.stringify(sendData),\n    token:msg._token\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 360,
+        "wires": [
+            [
+                "103db5b31710ef92"
+            ]
+        ]
+    },
+    {
+        "id": "b075d69011d91d2a",
+        "type": "function",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "解析平均车速",
+        "func": "try {\n    let davgData = msg.payload.data.data;\n    let deviceList = [];\n\n    let newAvgData = davgData.map((d) => {\n        const dname = d?.latest?.['ENTITY_FIELD']?.name?.value || '';\n        const rawVal = d?.aggLatest?.[\"1\"]?.current?.value;\n\n        deviceList.push(dname);\n\n        // 如果是数字，保留两位小数\n        let avg;\n        if (!isNaN(parseFloat(rawVal))) {\n            avg = Math.round(parseFloat(rawVal) * 100) / 100;\n        } else {\n            avg = rawVal || 0; // fallback\n        }\n\n        return {\n            dname,\n            avg\n        };\n    });\n    msg._deviceList = deviceList;\n    msg._avgData = newAvgData;\n    return [null, msg];\n} catch (error) {\n    node.warn(\"JSON parse Error: \" + error.message);\n    return [msg, null];\n}",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 360,
+        "wires": [
+            [],
+            [
+                "a873511ae7b25232"
+            ]
+        ]
+    },
+    {
+        "id": "d4b1701ec44b0259",
+        "type": "inject",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "7200",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "50",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 220,
+        "wires": [
+            [
+                "3008791bcd7a0d50"
+            ]
+        ]
+    },
+    {
+        "id": "3008791bcd7a0d50",
+        "type": "function",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "获取班次时间",
+        "func": "const moment = global.get('moment');\nconst zone = 'Asia/Shanghai';\n\nconst tz = moment.tz(zone);\nconst shanghaiTime = tz.format('YYYY-MM-DD HH:mm:ss');\nconst shifts = flow.get('flow_shifts') || [];\n\n\nmsg.objLastShift = getPreviousShift(shifts, shanghaiTime);\nmsg.objTime = getCurrentShift(shifts,shanghaiTime)\nmsg.objShiftDate = processShiftDate(msg.objTime)\nconst diffMinutes = moment(msg.objLastShift.end_time).diff(moment(msg.objLastShift.start_time), 'minutes');\nmsg.diffMinutes = diffMinutes// 计算上一班次分钟差\n\n\nreturn msg;\n\n/**\n * 获取当前时间所属的上一个班次\n * @param {Array} shiftArr - 班次数组\n * @param {String} inputTime - 当前时间字符串（上海时间）\n */\nfunction getPreviousShift(shiftArr, inputTime) {\n    const mNow = moment.tz(inputTime, 'YYYY-MM-DD HH:mm:ss', zone);\n\n    const shiftPeriods = [];\n\n    for (const shift of shiftArr) {\n        const startStr = shift.start_time;\n        const endStr = shift.end_time;\n        const isCrossDay = shift.sta_days;\n\n        let start, end;\n\n        if (!isCrossDay) {\n            start = moment.tz(mNow.format('YYYY-MM-DD') + ' ' + startStr, 'YYYY-MM-DD HH:mm:ss', zone);\n            end = moment.tz(mNow.format('YYYY-MM-DD') + ' ' + endStr, 'YYYY-MM-DD HH:mm:ss', zone);\n        } else {\n            // 跨天班次起始\n            start = moment.tz(mNow.format('YYYY-MM-DD') + ' ' + startStr, 'YYYY-MM-DD HH:mm:ss', zone);\n            end = moment(start).add(1, 'day').set({\n                hour: parseInt(endStr.split(':')[0]),\n                minute: parseInt(endStr.split(':')[1]),\n                second: parseInt(endStr.split(':')[2])\n            });\n        }\n\n        // 如果当前时间在班次前面（含跨天），班次属于“昨天”\n        if (mNow.isBefore(start)) {\n            start.subtract(1, 'day');\n            end.subtract(1, 'day');\n        }\n\n        shiftPeriods.push({\n            grp_name: shift.grp_name,\n            start,\n            end\n        });\n    }\n\n    // 对所有班次按时间升序排序\n    shiftPeriods.sort((a, b) => a.start.valueOf() - b.start.valueOf());\n\n    // 找到当前时间前的最后一个班次\n    for (let i = shiftPeriods.length - 1; i >= 0; i--) {\n        const s = shiftPeriods[i];\n        if (mNow.isSameOrAfter(s.end)) {\n            return {\n                grp_name: s.grp_name,\n                start_time: s.start.format('YYYY-MM-DD HH:mm:ss'),\n                end_time: s.end.format('YYYY-MM-DD HH:mm:ss')\n            };\n        }\n    }\n\n    // 如果都没有匹配，则返回当天最晚一个班次\n    const lastShift = shiftPeriods[shiftPeriods.length - 1];\n    return {\n        grp_name: lastShift.grp_name,\n        start_time: lastShift.start.format('YYYY-MM-DD HH:mm:ss'),\n        end_time: lastShift.end.format('YYYY-MM-DD HH:mm:ss')\n    };\n}\n\n/**\n * 获取当前时间的当前班次信息\n */\nfunction getCurrentShift(shiftArr, inputTime) {\n    const mNow = moment.tz(inputTime, 'YYYY-MM-DD HH:mm:ss', zone);\n\n    for (const shift of shiftArr) {\n        const startStr = shift.start_time;\n        const endStr = shift.end_time;\n        const isCrossDay = shift.sta_days;\n\n        // 构造两种起点（今天 + 昨天）\n        const baseDates = [mNow.clone(), mNow.clone().subtract(1, 'day')];\n\n        for (const base of baseDates) {\n            let start, end;\n\n            if (!isCrossDay) {\n                // 同一天\n                start = moment.tz(base.format('YYYY-MM-DD') + ' ' + startStr, 'YYYY-MM-DD HH:mm:ss', zone);\n                end = moment.tz(base.format('YYYY-MM-DD') + ' ' + endStr, 'YYYY-MM-DD HH:mm:ss', zone);\n            } else {\n                // 跨天处理\n                start = moment.tz(base.format('YYYY-MM-DD') + ' ' + startStr, 'YYYY-MM-DD HH:mm:ss', zone);\n                end = moment(start).clone().add(1, 'day').set({\n                    hour: parseInt(endStr.split(':')[0]),\n                    minute: parseInt(endStr.split(':')[1]),\n                    second: parseInt(endStr.split(':')[2])\n                });\n            }\n\n            if (mNow.isBetween(start, end, null, '[)')) {\n                return {\n                    grp_name: shift.grp_name,\n                    start_time: start.format('YYYY-MM-DD HH:mm:ss'),\n                    end_time: end.format('YYYY-MM-DD HH:mm:ss')\n                };\n            }\n        }\n    }\n\n    return null;\n}\n\n\nfunction processShiftDate(obj) {\n    // const moment = require('moment-timezone');\n    // const zone = 'Asia/Shanghai';\n\n    // 转为 moment 对象\n    let start = moment.tz(obj.start_time, 'YYYY-MM-DD HH:mm:ss', zone);\n    let end = moment.tz(obj.end_time, 'YYYY-MM-DD HH:mm:ss', zone);\n\n    // 判断班组名称并处理时间\n    if (obj.grp_name === '早班') {\n        start = start.subtract(1, 'day');\n    } else if (obj.grp_name === '晚班') {\n        end = end.add(1, 'day');\n    }\n\n    // 返回年月日格式\n    return {\n        start_date: start.format('YYYY-MM-DD'),\n        end_date: end.format('YYYY-MM-DD')\n    };\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 220,
+        "wires": [
+            [
+                "3ea58ec5dfd0caf3"
+            ]
+        ]
+    },
+    {
+        "id": "62a1240aab6dfb22",
+        "type": "delay",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "minutes",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 140,
+        "y": 280,
+        "wires": [
+            [
+                "593c1c40f6c2312c"
+            ]
+        ]
+    },
+    {
+        "id": "a873511ae7b25232",
+        "type": "function",
+        "z": "dff94457399eb8e5",
+        "g": "1df50d97bc9e50c2",
+        "name": "是否分批设备",
+        "func": "let sliceNum = 100;\nlet resData=[];\nlet dd = msg._deviceList||[];\nif (dd.length>sliceNum){\n    for (let i = 0; i < dd.length; i += sliceNum) {\n        resData.push(dd.slice(i, i + sliceNum).join(','))\n    }\n    msg._reqDevices = resData;\n    return [msg,null]\n}\nmsg._reqDno=dd.join(',');\nreturn [null,msg];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 360,
+        "wires": [
+            [
+                "d86f96b71aed1cd2"
+            ],
+            [
+                "3498a32c1be2e9dd"
+            ]
+        ]
+    }
+]
